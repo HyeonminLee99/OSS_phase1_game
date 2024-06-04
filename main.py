@@ -11,8 +11,12 @@ ORANGE = (255,165,0)
 CYAN = (0,255,255)
 PURPLE = (128,0,128)
 
+cell_size = 20
+cols = 20
+rows = 30
+maxfps = 30
 
-screen = pygame.display.set_mode((400,600))
+screen = pygame.display.set_mode((cell_size*cols,cell_size*rows))
 pygame.display.set_caption("Let's Tetris")
 block_size = 30
 
@@ -27,7 +31,6 @@ blocks = {
 }
 
 
-
 colors = {
     'I' : RED,
     'O' : GREEN,
@@ -38,46 +41,27 @@ colors = {
     'L' : PURPLE
 }
 
+
 def draw_block(block_type , block_position , offset_x , offset_y) :
     for pos in block_position :
         x = pos[0] * block_size + offset_x
         y = pos[1] * block_size + offset_y
         pygame.draw.rect(screen , colors[block_type], (x,y,block_size ,block_size))
 
+
 def rotate_clockwise(block_positions) :
     return [(y,-x) for x,y in block_positions]
+
+
+def remove_row(board , row) :
+    del board[row]
+    return [[0 for i in range(cols)]] + board
 
 
 rotated_blocks = {k: rotate_clockwise(v) for k,v in blocks.items()}
 running = True
 
 
-while running:
-    screen.fill(WHITE)
-
-    # 블록 그리기 (회전 전)
-    draw_block('I', blocks['I'], 30, 30)
-    draw_block('O', blocks['O'], 150, 30)
-    draw_block('T', blocks['T'], 270, 30)
-    draw_block('S', blocks['S'], 30, 150)
-    draw_block('Z', blocks['Z'], 150, 150)
-    draw_block('J', blocks['J'], 270, 150)
-    draw_block('L', blocks['L'], 30, 270)
-
-    # 회전된 블록 그리기
-    draw_block('I', rotated_blocks['I'], 30, 360)
-    draw_block('O', rotated_blocks['O'], 150, 360)
-    draw_block('T', rotated_blocks['T'], 270, 360)
-    draw_block('S', rotated_blocks['S'], 30, 480)
-    draw_block('Z', rotated_blocks['Z'], 150, 480)
-    draw_block('J', rotated_blocks['J'], 270, 480)
-    draw_block('L', rotated_blocks['L'], 30, 600)
-
-    pygame.display.flip()
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 
 pygame.quit()
 sys.exit()
