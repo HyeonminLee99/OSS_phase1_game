@@ -205,42 +205,38 @@ def main() :
                     board = update_board(board, cur_shape, cur_pos, cur_block)
                     board, cleared_rows = clear_row(board)
                     line_cleared += cleared_rows
-                    score += line_cleared*100
+                    score += cleared_rows*100
 
                     if line_cleared >= level *10 :
                         level += 1
                         fall_speed = max(0.1 , fall_speed - 0.05)
                         level_display(screen , level)
-
-
+                            
                     cur_block, cur_shape = new_block()
                     cur_pos = [cols // 2, 0]
                     if check_collision(board, cur_shape, cur_pos):
                         game_over = True
                         break
 
-                
                         
-
         draw_board(board, screen)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
 
         if paused:
-            font = pygame.font.Font(None, 36)
             text = font.render("Paused", True, WHITE)
             screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, screen.get_height() // 2 - text.get_height() // 2))
 
-        font = pygame.font.Font(None,36)
+
         score_text = font.render(f"Score: {score}", True, WHITE)
         level_text = font.render(f"Level: {level}", True, WHITE)
         screen.blit(score_text, (cell_size * cols + 10, 10))
         screen.blit(level_text, (cell_size * cols + 10, 50))
         
+
         pygame.display.flip()
         clock.tick(maxfps)
 
 
-    
     gameover_display(screen)
 
     restart = False
