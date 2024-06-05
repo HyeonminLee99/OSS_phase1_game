@@ -70,6 +70,13 @@ def draw_board(board, screen):
             pygame.draw.rect(screen, WHITE, (x * cell_size, y * cell_size, cell_size, cell_size), 1)
 
 
+def level_display(screen , level) :
+    level_text = font.render(f"Level {level}" , True , WHITE)
+    screen.blit(level_text ,  (screen.get_width() // 2 - level_text.get_width() // 2, screen.get_height() // 2 - level_text.get_height() // 2))
+    pygame.display.flip()
+    pygame.time.wait(1000)
+
+
 def rotate_clockwise(block_shape):
     return [(y, -x) for x, y in block_shape]
 
@@ -121,6 +128,10 @@ def main() :
     move_speed = 0.08
     move_time = 0
 
+    score = 0
+    level = 1
+    line_cleared = 0
+
 
     start = False
     while not start :
@@ -135,6 +146,8 @@ def main() :
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if buttun_rect.collidepoint(event.pos):
                     start = True
+
+    level_display(screen , level)
 
     while not game_over:
         screen.fill(BLACK)
@@ -182,6 +195,14 @@ def main() :
                 else:
                     board = update_board(board, cur_shape, cur_pos, cur_block)
                     board, cleared_rows = clear_row(board)
+                    line_cleared += cleared_rows
+                    score += line_cleared*100
+
+                    if line_cleared >= level *10 :
+                        level += 1
+                        fall_speed = max(0.1 , fall_speed - 0.05)
+                        level_display(screen , level)
+
                     cur_block, cur_shape = new_block()
                     cur_pos = [cols // 2, 0]
                     if check_collision(board, cur_shape, cur_pos):
