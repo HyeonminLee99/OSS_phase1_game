@@ -1,4 +1,4 @@
-from random import randrange as rand
+import random
 import pygame, sys
 
 WHITE = (255,255,255)
@@ -16,14 +16,6 @@ cols = 20
 rows = 30
 maxfps = 30
 
-screen = pygame.display.set_mode((cell_size*cols,cell_size*rows))
-pygame.display.set_caption("Let's Tetris")
-block_size = 30
-
-cur_block = None
-next_block = None
-game_over = False
-paused = False
 
 blocks = {
     'I' : [(0,1) , (1,1) , (2,1) , (3,1)],
@@ -46,6 +38,10 @@ colors = {
     'L' : PURPLE
 }
 
+pygame.init()
+screen = pygame.display.set_mode((cell_size*cols,cell_size*rows))
+pygame.display.set_caption("Let's Tetris")
+block_size = 30
 
 def draw_block(block_type , block_position , offset_x , offset_y) :
     for pos in block_position :
@@ -59,41 +55,28 @@ def rotate_clockwise(block_positions) :
 
 
 def remove_row(board , row) :
-    del board[row]
-    return [[0 for i in range(cols)]] + board
+    new_board = [row for row in board if any(cell == 0 for cell in row)]
+    cleared_rows = rows - len(new_board)
+    return [[0 for _ in range(cols)] for _ in range(cleared_rows)] + new_board, cleared_rows
 
 def new_stone() :
-    if cur_block is None :
-        cur_block = blocks[rand(len(blocks))]
-        next_block = blocks[rand(len(blocks))]
-
-    cur_block = next_block
-    next_block = blocks[rand(len(blocks))]
+    return random.choice(list(blocks.keys())) , blocks[random.choice(list(blocks.keys()))]
 
 
 def check_collision(board, block , offset) :
     off_x , off_y = offset
-    for cy, row in enumerate(blcok) :
-        for cx, cell in enumerate(row) :
-            try:
-                if cell and board[cy+off_y][cx+off_x] :
-                    return True
-            except IndexError:
-                return True
+    for pos in block :
+        x = pos[0] + off_x
+        y = pos[1] + off_y
+        if x < 0 or x >= cols or y >= rows or board[y][x] :
+            return True
     return False
-"""
-def move(board,step) :
-    if not game_over and not paused :
-        new_x = cur_block + step
 
-        if new_x < 0 :
-            new_x = 0
-        if new_x > cols - len(cur_block) :
-            new_x = cols - len(cur_block)
-        if not check_collision(board , )
 
-"""
-
+cur_block = None
+next_block = None
+game_over = False
+paused = False
     
 
 
