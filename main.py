@@ -58,8 +58,8 @@ def draw_board(board, screen) :
             pygame.draw.rect(screen, WHITE , (x*cell_size, y*cell_size, cell_size, cell_size))
 
 
-def rotate_clockwise(block_positions) :
-    return [(y,-x) for x,y in block_positions]
+def rotate_clockwise(block_shape) :
+    return [(y,-x) for x,y in block_shape]
 
 
 def clear_row(board , row) :
@@ -110,23 +110,52 @@ clock = pygame.time.Clock()
 
 while not game_over :
     screen.fill(BLACK)
-
-
-    if not check_collision(board , cur_block , cur_pos) :
-        cur_pos[1] += 1
-
-    else :
-        board = update_board(board , cur_block , cur_pos)
-        board, cleared_rows = clear_row(board)
-        cur_block , cur_shape = new_block()
-        cur_pos = [cols//2 , 0]
-        if check_collision(board, cur_block , cur_pos):
+    for event in pygame.event.get() :
+        if event.type == pygame.QUIT :
             game_over = True
+        if event.type == pygame.KEYDOWN :
+            if event.key == pygame.K_LEFT :
+                if not check_collision(board , cur_block ,cur_pos) :
+                    cur_pos[0] -= 1
 
-            
+            if event.key == pygame.K_RIGHT :
+                if not check_collision(board , cur_block ,cur_pos) :
+                    cur_pos[0] += 1
+
+            if event.key == pygame.K_DOWN :
+                if not check_collision(board , cur_block ,cur_pos) :
+                    cur_pos[1] += 1
+
+            if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT :
+                rotated_shape = rotate_clockwise(cur_shape)
+                if not check_collision(board , rotated_shape , cur_pos):
+                    cur_shape = rotated_shape
+
+            if event.key == pygame.K_p :
+                paused = not paused
+
+
+
+    if not paused :      
+        if not check_collision(board , cur_block , cur_pos) :
+            cur_pos[1] += 1
+
+        else :
+            board = update_board(board , cur_block , cur_pos)
+            board, cleared_rows = clear_row(board)
+            cur_block , cur_shape = new_block()
+            cur_pos = [cols//2 , 0]
+            if check_collision(board, cur_block , cur_pos):
+                game_over = True
+
     draw_board(board , screen)
 
     draw_block(cur_block , cur_shape , cur_pos[0]*cell_size , cur_pos[1]*cell_size)
+
+    if paused :
+        font = pygame.font.Font(None , 36)
+        text = font.render("Paused" , True , WHITE) 
+        screen.blit(text, (screen.get_width()//2 - text.get_width() // 2 , screen.get_height() // 2 - text.get_height()//2))
 
     pygame.display.flip()
     clock.tick(maxfps)
