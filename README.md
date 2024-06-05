@@ -62,3 +62,5 @@
 
 ## 실행 예시
 
+![실행결과](https://github.com/HyeonminLee99/OSS_phase1_game/assets/133738567/b1cc0232-52a9-4e49-af2c-eb160ea80685)
+
