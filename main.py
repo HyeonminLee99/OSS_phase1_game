@@ -59,10 +59,22 @@ def rotate_clockwise(block_positions) :
     return [(y,-x) for x,y in block_positions]
 
 
-def remove_row(board , row) :
+def clear_row(board , row) :
     new_board = [row for row in board if any(cell == 0 for cell in row)]
     cleared_rows = rows - len(new_board)
     return [[0 for _ in range(cols)] for _ in range(cleared_rows)] + new_board, cleared_rows
+
+def update_board(board , block , offset) :
+    off_x , off_y = offset
+    for pos in block :
+        x = pos[0] + off_x
+        y = pos[1] + off_y
+        board[y][x] = 1
+    return board
+
+def remove_row(board , row) :
+    del board[row]
+    return [[0 for _ in range(cols)]] + board
 
 def new_block() :
     return random.choice(list(blocks.keys())) , blocks[random.choice(list(blocks.keys()))]
@@ -77,11 +89,18 @@ def check_collision(board, block , offset) :
             return True
     return False
 
+
+
+
 game_over = False
 paused = False
 board = [[0 for _ in range(cols)] for _ in range(rows)]
-cur_blocks , cur_shape = new_block()
+cur_block , cur_shape = new_block()
 cur_pos = [cols // 2 , 0]
+clock = pygame.time.Clock()
+
+
+
 
 while not game_over :
     screen.fill(BLACK)
@@ -89,10 +108,13 @@ while not game_over :
 
     draw_board(board , screen)
 
+    draw_block(cur_block , cur_shape , cur_pos[0]*cell_size , cur_pos[1]*cell_size)
 
-pygame.time.set_timer(pygame.USEREVENT +1 , 1000)
-rotated_blocks = {k: rotate_clockwise(v) for k,v in blocks.items()}
-running = True
+    pygame.display.flip()
+    clock.tick(maxfps)
+    
+
+
 
 
 
