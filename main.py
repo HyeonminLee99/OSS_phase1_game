@@ -38,10 +38,12 @@ colors = {
     'L' : PURPLE
 }
 
+
 pygame.init()
 screen = pygame.display.set_mode((cell_size*cols,cell_size*rows))
 pygame.display.set_caption("Let's Tetris")
 block_size = 30
+
 
 def draw_block(block_type , block_position , offset_x , offset_y) :
     for pos in block_position :
@@ -55,6 +57,7 @@ def draw_board(board, screen) :
         for x , cell in enumerate(row) :
             pygame.draw.rect(screen, WHITE , (x*cell_size, y*cell_size, cell_size, cell_size))
 
+
 def rotate_clockwise(block_positions) :
     return [(y,-x) for x,y in block_positions]
 
@@ -64,6 +67,7 @@ def clear_row(board , row) :
     cleared_rows = rows - len(new_board)
     return [[0 for _ in range(cols)] for _ in range(cleared_rows)] + new_board, cleared_rows
 
+
 def update_board(board , block , offset) :
     off_x , off_y = offset
     for pos in block :
@@ -72,9 +76,11 @@ def update_board(board , block , offset) :
         board[y][x] = 1
     return board
 
+
 def remove_row(board , row) :
     del board[row]
     return [[0 for _ in range(cols)]] + board
+
 
 def new_block() :
     return random.choice(list(blocks.keys())) , blocks[random.choice(list(blocks.keys()))]
@@ -106,6 +112,18 @@ while not game_over :
     screen.fill(BLACK)
 
 
+    if not check_collision(board , cur_block , cur_pos) :
+        cur_pos[1] += 1
+
+    else :
+        board = update_board(board , cur_block , cur_pos)
+        board, cleared_rows = clear_row(board)
+        cur_block , cur_shape = new_block()
+        cur_pos = [cols//2 , 0]
+        if check_collision(board, cur_block , cur_pos):
+            game_over = True
+
+            
     draw_board(board , screen)
 
     draw_block(cur_block , cur_shape , cur_pos[0]*cell_size , cur_pos[1]*cell_size)
