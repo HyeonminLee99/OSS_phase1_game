@@ -73,7 +73,9 @@ def update_board(board , block , offset) :
     for pos in block :
         x = pos[0] + off_x
         y = pos[1] + off_y
-        board[y][x] = 1
+
+        if y >= 0:
+            board[y][x] = 1
     return board
 
 
@@ -91,7 +93,9 @@ def check_collision(board, block , offset) :
     for pos in block :
         x = pos[0] + off_x
         y = pos[1] + off_y
-        if x < 0 or x >= cols or y >= rows or board[y][x] :
+        if x < 0 or x >= cols or y >= rows:
+            return True
+        if y >= 0 and board[y][x] :
             return True
     return False
 
@@ -110,20 +114,21 @@ clock = pygame.time.Clock()
 
 while not game_over :
     screen.fill(BLACK)
+
     for event in pygame.event.get() :
         if event.type == pygame.QUIT :
             game_over = True
         if event.type == pygame.KEYDOWN :
             if event.key == pygame.K_LEFT :
-                if not check_collision(board , cur_block ,cur_pos) :
+                if not check_collision(board , cur_shape ,cur_pos) :
                     cur_pos[0] -= 1
 
             if event.key == pygame.K_RIGHT :
-                if not check_collision(board , cur_block ,cur_pos) :
+                if not check_collision(board , cur_shape ,cur_pos) :
                     cur_pos[0] += 1
 
             if event.key == pygame.K_DOWN :
-                if not check_collision(board , cur_block ,cur_pos) :
+                if not check_collision(board , cur_shape ,cur_pos) :
                     cur_pos[1] += 1
 
             if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT :
@@ -137,15 +142,15 @@ while not game_over :
 
 
     if not paused :      
-        if not check_collision(board , cur_block , cur_pos) :
+        if not check_collision(board , cur_shape , cur_pos) :
             cur_pos[1] += 1
 
         else :
-            board = update_board(board , cur_block , cur_pos)
+            board = update_board(board , cur_shape , cur_pos)
             board, cleared_rows = clear_row(board)
             cur_block , cur_shape = new_block()
             cur_pos = [cols//2 , 0]
-            if check_collision(board, cur_block , cur_pos):
+            if check_collision(board, cur_shape , cur_pos):
                 game_over = True
 
     draw_board(board , screen)
@@ -160,9 +165,6 @@ while not game_over :
     pygame.display.flip()
     clock.tick(maxfps)
     
-
-
-
 
 
 pygame.quit()
