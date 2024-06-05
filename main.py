@@ -1,171 +1,165 @@
 import random
 import pygame, sys
 
-WHITE = (255,255,255)
-BLACK = (0,0,0)
-RED = (255,0,0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-YELLOW = (255,255,0)
-ORANGE = (255,165,0)
-CYAN = (0,255,255)
-PURPLE = (128,0,128)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+ORANGE = (255, 165, 0)
+CYAN = (0, 255, 255)
+PURPLE = (128, 0, 128)
 
 cell_size = 20
-cols = 20
-rows = 30
-maxfps = 30
-
+cols = 15
+rows = 20
+maxfps = 60
 
 blocks = {
-    'I' : [(0,1) , (1,1) , (2,1) , (3,1)],
-    'O' : [(1,0) , (2,0) , (1,1) , (2,1)],
-    'T' : [(1,0) , (0,1) , (1,1) , (2,1)],
-    'S' : [(1,0) , (2,0) , (0,1) , (1,1)],
-    'Z' : [(0,0) , (1,0) , (1,1) , (2,1)],
-    'J' : [(0,0) , (0,1) , (1,1) , (2,1)],
-    'L' : [(2,0) , (0,1) , (1,1) , (2,1)]
+    'I': [(0, 1), (1, 1), (2, 1), (3, 1)],
+    'O': [(1, 0), (2, 0), (1, 1), (2, 1)],
+    'T': [(1, 0), (0, 1), (1, 1), (2, 1)],
+    'S': [(1, 0), (2, 0), (0, 1), (1, 1)],
+    'Z': [(0, 0), (1, 0), (1, 1), (2, 1)],
+    'J': [(0, 0), (0, 1), (1, 1), (2, 1)],
+    'L': [(2, 0), (0, 1), (1, 1), (2, 1)]
 }
-
 
 colors = {
-    'I' : RED,
-    'O' : GREEN,
-    'T' : BLUE,
-    'S' : YELLOW,
-    'Z' : ORANGE,
-    'J' : CYAN,
-    'L' : PURPLE
+    'I': RED,
+    'O': GREEN,
+    'T': BLUE,
+    'S': YELLOW,
+    'Z': ORANGE,
+    'J': CYAN,
+    'L': PURPLE
 }
 
-
 pygame.init()
-screen = pygame.display.set_mode((cell_size*cols,cell_size*rows))
+screen = pygame.display.set_mode((cell_size * cols, cell_size * rows))
 pygame.display.set_caption("Let's Tetris")
-block_size = 30
+block_size = 20
 
-
-def draw_block(block_type , block_position , offset_x , offset_y) :
-    for pos in block_position :
+def draw_block(block_type, block_position, offset_x, offset_y):
+    for pos in block_position:
         x = pos[0] * block_size + offset_x
         y = pos[1] * block_size + offset_y
-        pygame.draw.rect(screen , colors[block_type], (x,y,block_size ,block_size))
+        pygame.draw.rect(screen, colors[block_type], (x, y, block_size, block_size))
 
+def draw_board(board, screen):
+    for y, row in enumerate(board):
+        for x, cell in enumerate(row):
+            if cell:
+                pygame.draw.rect(screen, colors[cell], (x * cell_size, y * cell_size, cell_size, cell_size))
+            pygame.draw.rect(screen, WHITE, (x * cell_size, y * cell_size, cell_size, cell_size), 1)
 
-def draw_board(board, screen) :
-    for y , row in enumerate(board) :
-        for x , cell in enumerate(row) :
-            pygame.draw.rect(screen, WHITE , (x*cell_size, y*cell_size, cell_size, cell_size))
+def rotate_clockwise(block_shape):
+    return [(y, -x) for x, y in block_shape]
 
-
-def rotate_clockwise(block_shape) :
-    return [(y,-x) for x,y in block_shape]
-
-
-def clear_row(board , row) :
+def clear_row(board):
     new_board = [row for row in board if any(cell == 0 for cell in row)]
     cleared_rows = rows - len(new_board)
     return [[0 for _ in range(cols)] for _ in range(cleared_rows)] + new_board, cleared_rows
 
-
-def update_board(board , block , offset) :
-    off_x , off_y = offset
-    for pos in block :
+def update_board(board, block, offset, block_type):
+    off_x, off_y = offset
+    for pos in block:
         x = pos[0] + off_x
         y = pos[1] + off_y
-
         if y >= 0:
-            board[y][x] = 1
+            board[y][x] = block_type
     return board
 
+def new_block():
+    block_type = random.choice(list(blocks.keys()))
+    return block_type, blocks[block_type]
 
-def remove_row(board , row) :
-    del board[row]
-    return [[0 for _ in range(cols)]] + board
-
-
-def new_block() :
-    return random.choice(list(blocks.keys())) , blocks[random.choice(list(blocks.keys()))]
-
-
-def check_collision(board, block , offset) :
-    off_x , off_y = offset
-    for pos in block :
+def check_collision(board, block, offset):
+    off_x, off_y = offset
+    for pos in block:
         x = pos[0] + off_x
         y = pos[1] + off_y
         if x < 0 or x >= cols or y >= rows:
             return True
-        if y >= 0 and board[y][x] :
+        if y >= 0 and board[y][x]:
             return True
     return False
-
-
-
 
 game_over = False
 paused = False
 board = [[0 for _ in range(cols)] for _ in range(rows)]
-cur_block , cur_shape = new_block()
-cur_pos = [cols // 2 , 0]
+cur_block, cur_shape = new_block()
+cur_pos = [cols // 2, 0]
 clock = pygame.time.Clock()
 
+fall_time = 0
+fall_speed = 0.1
 
+move_speed = 0.08
+move_time = 0
 
-
-while not game_over :
+while not game_over:
     screen.fill(BLACK)
 
-    for event in pygame.event.get() :
-        if event.type == pygame.QUIT :
+    dt = clock.tick(maxfps) / 1000
+    fall_time += dt
+    move_time += dt
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
             game_over = True
-        if event.type == pygame.KEYDOWN :
-            if event.key == pygame.K_LEFT :
-                if not check_collision(board , cur_shape ,cur_pos) :
-                    cur_pos[0] -= 1
-
-            if event.key == pygame.K_RIGHT :
-                if not check_collision(board , cur_shape ,cur_pos) :
-                    cur_pos[0] += 1
-
-            if event.key == pygame.K_DOWN :
-                if not check_collision(board , cur_shape ,cur_pos) :
-                    cur_pos[1] += 1
-
-            if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT :
-                rotated_shape = rotate_clockwise(cur_shape)
-                if not check_collision(board , rotated_shape , cur_pos):
-                    cur_shape = rotated_shape
-
-            if event.key == pygame.K_p :
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
                 paused = not paused
+            if not paused:
+                if event.key == pygame.K_LEFT:
+                    if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
+                        cur_pos[0] -= 1
+                if event.key == pygame.K_RIGHT:
+                    if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
+                        cur_pos[0] += 1
+                if event.key == pygame.K_DOWN:
+                    if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
+                        cur_pos[1] += 1
+                if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
+                    rotated_shape = rotate_clockwise(cur_shape)
+                    if not check_collision(board, rotated_shape, cur_pos):
+                        cur_shape = rotated_shape
 
+    keys = pygame.key.get_pressed()
+    if not paused:
+        if keys[pygame.K_LEFT] and move_time >= move_speed:
+            if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
+                cur_pos[0] -= 1
+            move_time = 0
+        if keys[pygame.K_RIGHT] and move_time >= move_speed:
+            if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
+                cur_pos[0] += 1
+            move_time = 0
 
+        if fall_time >= fall_speed:
+            fall_time = 0
+            if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
+                cur_pos[1] += 1
+            else:
+                board = update_board(board, cur_shape, cur_pos, cur_block)
+                board, cleared_rows = clear_row(board)
+                cur_block, cur_shape = new_block()
+                cur_pos = [cols // 2, 0]
+                if check_collision(board, cur_shape, cur_pos):
+                    game_over = True
 
-    if not paused :      
-        if not check_collision(board , cur_shape , cur_pos) :
-            cur_pos[1] += 1
+    draw_board(board, screen)
+    draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
 
-        else :
-            board = update_board(board , cur_shape , cur_pos)
-            board, cleared_rows = clear_row(board)
-            cur_block , cur_shape = new_block()
-            cur_pos = [cols//2 , 0]
-            if check_collision(board, cur_shape , cur_pos):
-                game_over = True
-
-    draw_board(board , screen)
-
-    draw_block(cur_block , cur_shape , cur_pos[0]*cell_size , cur_pos[1]*cell_size)
-
-    if paused :
-        font = pygame.font.Font(None , 36)
-        text = font.render("Paused" , True , WHITE) 
-        screen.blit(text, (screen.get_width()//2 - text.get_width() // 2 , screen.get_height() // 2 - text.get_height()//2))
+    if paused:
+        font = pygame.font.Font(None, 36)
+        text = font.render("Paused", True, WHITE)
+        screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, screen.get_height() // 2 - text.get_height() // 2))
 
     pygame.display.flip()
     clock.tick(maxfps)
-    
-
 
 pygame.quit()
 sys.exit()
