@@ -50,6 +50,11 @@ def draw_block(block_type , block_position , offset_x , offset_y) :
         pygame.draw.rect(screen , colors[block_type], (x,y,block_size ,block_size))
 
 
+def draw_board(board, screen) :
+    for y , row in enumerate(board) :
+        for x , cell in enumerate(row) :
+            pygame.draw.rect(screen, WHITE , (x*cell_size, y*cell_size, cell_size, cell_size))
+
 def rotate_clockwise(block_positions) :
     return [(y,-x) for x,y in block_positions]
 
@@ -59,7 +64,7 @@ def remove_row(board , row) :
     cleared_rows = rows - len(new_board)
     return [[0 for _ in range(cols)] for _ in range(cleared_rows)] + new_board, cleared_rows
 
-def new_stone() :
+def new_block() :
     return random.choice(list(blocks.keys())) , blocks[random.choice(list(blocks.keys()))]
 
 
@@ -72,13 +77,17 @@ def check_collision(board, block , offset) :
             return True
     return False
 
-
-cur_block = None
-next_block = None
 game_over = False
 paused = False
-    
+board = [[0 for _ in range(cols)] for _ in range(rows)]
+cur_blocks , cur_shape = new_block()
+cur_pos = [cols // 2 , 0]
 
+while not game_over :
+    screen.fill(BLACK)
+
+
+    draw_board(board , screen)
 
 
 pygame.time.set_timer(pygame.USEREVENT +1 , 1000)
