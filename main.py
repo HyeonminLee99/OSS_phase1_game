@@ -16,6 +16,7 @@ PURPLE = (128, 0, 128)
 cell_size = 20
 cols = 15
 rows = 20
+score_width = 150
 maxfps = 60
 
 
@@ -42,14 +43,14 @@ colors = {
 
 
 pygame.init()
-screen = pygame.display.set_mode((cell_size * cols, cell_size * rows))
+screen = pygame.display.set_mode((cell_size * cols + score_width, cell_size * rows))
 pygame.display.set_caption("Let's Tetris")
 block_size = 20
 font = pygame.font.Font(None , 36)
 
-def draw_start_button(screen) :
-    button_text = font.render("Start", True, BLACK)
-    button_rect = pygame.Rect((cell_size * cols) // 2 - 50, (cell_size * rows) // 2 - 25, 100, 50)
+def draw_start_button(screen , text = "Start") :
+    button_text = font.render(text, True, BLACK)
+    button_rect = pygame.Rect((cell_size * cols + score_width) // 2 - 50, (cell_size * rows) // 2 - 25, 100, 50)
     pygame.draw.rect(screen, WHITE, button_rect)
     screen.blit(button_text, (button_rect.x + (100 - button_text.get_width()) // 2, button_rect.y + (50 - button_text.get_height()) // 2))
     return button_rect
@@ -72,9 +73,17 @@ def draw_board(board, screen):
 
 def level_display(screen , level) :
     level_text = font.render(f"Level {level}" , True , WHITE)
-    screen.blit(level_text ,  (screen.get_width() // 2 - level_text.get_width() // 2, screen.get_height() // 2 - level_text.get_height() // 2))
+    screen.blit(level_text ,  (screen.get_width() // 2 - level_text.get_width() // 2, (cell_size * rows) // 2 - 60))
     pygame.display.flip()
     pygame.time.wait(1000)
+
+
+def gameover_display(screen) :
+    gameover_text = font.render("Game Over" , True , WHITE)
+    screen.blit(gameover_text ,  (screen.get_width() // 2 - gameover_text.get_width() // 2, (cell_size * rows) // 2 - 60))
+    pygame.display.flip()
+    pygame.time.wait(2000)
+
 
 
 def rotate_clockwise(block_shape):
@@ -203,10 +212,15 @@ def main() :
                         fall_speed = max(0.1 , fall_speed - 0.05)
                         level_display(screen , level)
 
+
                     cur_block, cur_shape = new_block()
                     cur_pos = [cols // 2, 0]
                     if check_collision(board, cur_shape, cur_pos):
                         game_over = True
+                        break
+
+                
+                        
 
         draw_board(board, screen)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
@@ -216,11 +230,34 @@ def main() :
             text = font.render("Paused", True, WHITE)
             screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, screen.get_height() // 2 - text.get_height() // 2))
 
+        font = pygame.font.Font(None,36)
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        level_text = font.render(f"Level: {level}", True, WHITE)
+        screen.blit(score_text, (cell_size * cols + 10, 10))
+        screen.blit(level_text, (cell_size * cols + 10, 50))
+        
         pygame.display.flip()
         clock.tick(maxfps)
 
-    pygame.quit()
-    sys.exit()
+
+    
+    gameover_display(screen)
+
+    restart = False
+    while not restart :
+        screen.fill(BLACK)
+        button_rect = draw_start_button(screen , "Restart")
+        pygame.display.flip()
+
+
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if button_rect.collidepoint(event.pos):
+                        restart = True
+
 
 
 if __name__ == "__main__" :
