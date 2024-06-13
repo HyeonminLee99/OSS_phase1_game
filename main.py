@@ -172,15 +172,21 @@ def main() :
                 if event.key == pygame.K_p:
                     paused = not paused
                 if not paused:
-                    if event.key == pygame.K_LEFT:
-                        if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
-                            cur_pos[0] -= 1
-                    if event.key == pygame.K_RIGHT:
-                        if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
-                            cur_pos[0] += 1
-                    if event.key == pygame.K_DOWN:
-                        if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
-                            cur_pos[1] += 1
+                    ########################################
+                    ############### PHASE 2 ################
+                    ########################################
+                    # if event.key == pygame.K_LEFT:
+                    #     if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
+                    #         cur_pos[0] -= 1
+                    # if event.key == pygame.K_RIGHT:
+                    #     if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
+                    #         cur_pos[0] += 1
+                    # if event.key == pygame.K_DOWN:
+                    #     if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
+                    #         cur_pos[1] += 1
+                    ########################################
+                    ############### PHASE 2 ################
+                    ########################################
                     if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
                         rotated_shape = rotate_clockwise(cur_shape)
                         if not check_collision(board, rotated_shape, cur_pos):
