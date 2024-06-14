@@ -121,13 +121,37 @@ def check_collision(board, block, offset):
         if y >= 0 and board[y][x]:
             return True
     return False
+########################################
+########## PHASE 2 Function 2 ##########
+########################################
+def get_drop_position(board, block, offset):
+    off_x, off_y = offset
+    while not check_collision(board, block, (off_x, off_y)):
+        off_y += 1
+    return off_x, off_y - 1
 
+def draw_drop_block(block_type, block_position, offset_x, offset_y):
+    GRAY = (128, 128, 128)
+    for pos in block_position:
+        x = pos[0] * block_size + offset_x
+        y = pos[1] * block_size + offset_y
+        pygame.draw.rect(screen, GRAY, (x, y, block_size, block_size))
+########################################
+########## PHASE 2 Function 2 ##########
+########################################
 
 def main() :
     game_over = False
     paused = False
     board = [[0 for _ in range(cols)] for _ in range(rows)]
     cur_block, cur_shape = new_block()
+    ########################################
+    ########## PHASE 2 Function 3 ##########
+    ########################################
+    next_block, next_shape = new_block()
+    ########################################
+    ########## PHASE 2 Function 3 ##########
+    ########################################
     cur_pos = [cols // 2, 0]
     clock = pygame.time.Clock()
 
@@ -172,19 +196,34 @@ def main() :
                 if event.key == pygame.K_p:
                     paused = not paused
                 if not paused:
-                    if event.key == pygame.K_LEFT:
-                        if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
-                            cur_pos[0] -= 1
-                    if event.key == pygame.K_RIGHT:
-                        if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
-                            cur_pos[0] += 1
-                    if event.key == pygame.K_DOWN:
-                        if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
-                            cur_pos[1] += 1
+                    ########################################
+                    ########## PHASE 2 Function 1 ##########
+                    ########################################
+                    # if event.key == pygame.K_LEFT:
+                    #     if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
+                    #         cur_pos[0] -= 1
+                    # if event.key == pygame.K_RIGHT:
+                    #     if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
+                    #         cur_pos[0] += 1
+                    # if event.key == pygame.K_DOWN:
+                    #     if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
+                    #         cur_pos[1] += 1
+                    ########################################
+                    ########## PHASE 2 Function 1 ##########
+                    ########################################
                     if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
                         rotated_shape = rotate_clockwise(cur_shape)
                         if not check_collision(board, rotated_shape, cur_pos):
                             cur_shape = rotated_shape
+                    ########################################
+                    ########## PHASE 2 Function 1 ##########
+                    ########################################
+                    if event.key == pygame.K_SPACE:
+                        while not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
+                            cur_pos[1] += 1
+                    ########################################
+                    ########## PHASE 2 Function 1 ##########
+                    ########################################
 
         keys = pygame.key.get_pressed()
         if not paused:
@@ -196,7 +235,16 @@ def main() :
                 if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
                     cur_pos[0] += 1
                 move_time = 0
-
+            ########################################
+            ########## PHASE 2 Function 1 ##########
+            ########################################
+            if keys[pygame.K_DOWN] and move_time >= move_speed:
+                if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1]+1)):
+                    cur_pos[1] += 1
+                move_time = 0
+            ########################################
+            ########## PHASE 2 Function 1 ##########
+            ########################################
             if fall_time >= fall_speed:
                 fall_time = 0
                 if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
@@ -211,8 +259,15 @@ def main() :
                         level += 1
                         fall_speed = max(0.1 , fall_speed - 0.05)
                         level_display(screen , level)
-                            
-                    cur_block, cur_shape = new_block()
+                    ########################################
+                    ########## PHASE 2 Function 3 ##########
+                    ########################################
+                    # cur_block, cur_shape = new_block()
+                    cur_block, cur_shape = next_block, next_shape
+                    next_block, next_shape = new_block()
+                    ########################################
+                    ########## PHASE 2 Function 3 ##########
+                    ########################################
                     cur_pos = [cols // 2, 0]
                     if check_collision(board, cur_shape, cur_pos):
                         game_over = True
@@ -221,6 +276,14 @@ def main() :
                         
         draw_board(board, screen)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
+        ########################################
+        ########## PHASE 2 Function 2 ##########
+        ########################################
+        drop_pos = get_drop_position(board, cur_shape, cur_pos)
+        draw_drop_block(cur_block, cur_shape, drop_pos[0] * cell_size, drop_pos[1] * cell_size)
+        ########################################
+        ########## PHASE 2 Function 2 ##########
+        ########################################
 
         if paused:
             text = font.render("Paused", True, WHITE)
@@ -232,7 +295,16 @@ def main() :
         screen.blit(score_text, (cell_size * cols + 10, 10))
         screen.blit(level_text, (cell_size * cols + 10, 50))
         
-
+        ########################################
+        ########## PHASE 2 Function 3 ##########
+        ########################################
+        next_block_text = font.render("Next:", True, WHITE)
+        screen.blit(next_block_text, (cell_size * cols + 10, 100))
+        draw_block(next_block, next_shape, cell_size * cols + 10, 150)
+        ########################################
+        ########## PHASE 2 Function 3 ##########
+        ########################################
+        
         pygame.display.flip()
         clock.tick(maxfps)
 
