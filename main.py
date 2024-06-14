@@ -145,6 +145,13 @@ def main() :
     paused = False
     board = [[0 for _ in range(cols)] for _ in range(rows)]
     cur_block, cur_shape = new_block()
+    ########################################
+    ########## PHASE 2 Function 3 ##########
+    ########################################
+    next_block, next_shape = new_block()
+    ########################################
+    ########## PHASE 2 Function 3 ##########
+    ########################################
     cur_pos = [cols // 2, 0]
     clock = pygame.time.Clock()
 
@@ -252,8 +259,15 @@ def main() :
                         level += 1
                         fall_speed = max(0.1 , fall_speed - 0.05)
                         level_display(screen , level)
-                            
-                    cur_block, cur_shape = new_block()
+                    ########################################
+                    ########## PHASE 2 Function 3 ##########
+                    ########################################
+                    # cur_block, cur_shape = new_block()
+                    cur_block, cur_shape = next_block, next_shape
+                    next_block, next_shape = new_block()
+                    ########################################
+                    ########## PHASE 2 Function 3 ##########
+                    ########################################
                     cur_pos = [cols // 2, 0]
                     if check_collision(board, cur_shape, cur_pos):
                         game_over = True
@@ -281,7 +295,16 @@ def main() :
         screen.blit(score_text, (cell_size * cols + 10, 10))
         screen.blit(level_text, (cell_size * cols + 10, 50))
         
-
+        ########################################
+        ########## PHASE 2 Function 3 ##########
+        ########################################
+        next_block_text = font.render("Next:", True, WHITE)
+        screen.blit(next_block_text, (cell_size * cols + 10, 100))
+        draw_block(next_block, next_shape, cell_size * cols + 10, 150)
+        ########################################
+        ########## PHASE 2 Function 3 ##########
+        ########################################
+        
         pygame.display.flip()
         clock.tick(maxfps)
 
