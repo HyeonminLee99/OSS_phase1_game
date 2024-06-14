@@ -205,7 +205,16 @@ def main() :
                 if not check_collision(board, cur_shape, (cur_pos[0] + 1, cur_pos[1])):
                     cur_pos[0] += 1
                 move_time = 0
-
+            ########################################
+            ########## PHASE 2 Function 1 ##########
+            ########################################
+            if keys[pygame.K_DOWN] and move_time >= move_speed:
+                if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1]+1)):
+                    cur_pos[1] += 1
+                move_time = 0
+            ########################################
+            ########## PHASE 2 Function 1 ##########
+            ########################################
             if fall_time >= fall_speed:
                 fall_time = 0
                 if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
