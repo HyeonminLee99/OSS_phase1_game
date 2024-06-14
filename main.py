@@ -185,6 +185,15 @@ def main() :
                         rotated_shape = rotate_clockwise(cur_shape)
                         if not check_collision(board, rotated_shape, cur_pos):
                             cur_shape = rotated_shape
+                    ########################################
+                    ########## PHASE 2 Function 1 ##########
+                    ########################################
+                    if event.key == pygame.K_SPACE:
+                        while not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
+                            cur_pos[1] += 1
+                    ########################################
+                    ########## PHASE 2 Function 1 ##########
+                    ########################################
 
         keys = pygame.key.get_pressed()
         if not paused:
