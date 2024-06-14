@@ -121,7 +121,24 @@ def check_collision(board, block, offset):
         if y >= 0 and board[y][x]:
             return True
     return False
+########################################
+########## PHASE 2 Function 2 ##########
+########################################
+def get_drop_position(board, block, offset):
+    off_x, off_y = offset
+    while not check_collision(board, block, (off_x, off_y)):
+        off_y += 1
+    return off_x, off_y - 1
 
+def draw_drop_block(block_type, block_position, offset_x, offset_y):
+    GRAY = (128, 128, 128)
+    for pos in block_position:
+        x = pos[0] * block_size + offset_x
+        y = pos[1] * block_size + offset_y
+        pygame.draw.rect(screen, GRAY, (x, y, block_size, block_size))
+########################################
+########## PHASE 2 Function 2 ##########
+########################################
 
 def main() :
     game_over = False
@@ -245,6 +262,14 @@ def main() :
                         
         draw_board(board, screen)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
+        ########################################
+        ########## PHASE 2 Function 2 ##########
+        ########################################
+        drop_pos = get_drop_position(board, cur_shape, cur_pos)
+        draw_drop_block(cur_block, cur_shape, drop_pos[0] * cell_size, drop_pos[1] * cell_size)
+        ########################################
+        ########## PHASE 2 Function 2 ##########
+        ########################################
 
         if paused:
             text = font.render("Paused", True, WHITE)
