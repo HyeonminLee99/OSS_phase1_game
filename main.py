@@ -62,13 +62,26 @@ def draw_block(block_type, block_position, offset_x, offset_y):
         y = pos[1] * block_size + offset_y
         pygame.draw.rect(screen, colors[block_type], (x, y, block_size, block_size))
 
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########     
+def draw_grid(screen):
+    for x in range(0, cell_size * cols, cell_size):
+        pygame.draw.line(screen, WHITE, (x, 0), (x, cell_size * rows))
+    for y in range(0, cell_size * rows, cell_size):
+        pygame.draw.line(screen, WHITE, (0, y), (cell_size * cols, y))
+#########################################################
 
-def draw_board(board, screen):
+def draw_board(board, screen, show_grid):
     for y, row in enumerate(board):
         for x, cell in enumerate(row):
             if cell:
                 pygame.draw.rect(screen, colors[cell], (x * cell_size, y * cell_size, cell_size, cell_size))
-            pygame.draw.rect(screen, WHITE, (x * cell_size, y * cell_size, cell_size, cell_size), 1)
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########   
+            if show_grid:
+#########################################################
+                pygame.draw.rect(screen, WHITE, (x * cell_size, y * cell_size, cell_size, cell_size), 1)
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########
+            pygame.draw.line(screen, WHITE, (cols * cell_size - 1, 0), (cols * cell_size - 1, rows * cell_size))
+#########################################################
 
 
 def level_display(screen , level) :
@@ -85,10 +98,13 @@ def gameover_display(screen) :
     pygame.time.wait(2000)
 
 
-
 def rotate_clockwise(block_shape):
     return [(y, -x) for x, y in block_shape]
 
+########## Phase 2 - 추가 기능 구현 2 = 시계/반시계 회전 ##########
+def rotate_counterclockwise(block_shape):
+    return [(-y, x) for x, y in block_shape]
+##############################################################
 
 def clear_row(board):
     new_board = [row for row in board if any(cell == 0 for cell in row)]
@@ -122,10 +138,19 @@ def check_collision(board, block, offset):
             return True
     return False
 
+######### Phase 2 - 추가 구현 기능 3 = 블록 저장 #########
+def draw_stored_block(stored_block, screen):
+    if stored_block:
+        block_type, block_shape = stored_block
+        draw_block(block_type, block_shape, cell_size * (cols + 1), cell_size * 10)
+######################################################
 
 def main() :
     game_over = False
     paused = False
+    ###### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off ######
+    show_grid = True 
+    ##################################################
     board = [[0 for _ in range(cols)] for _ in range(rows)]
     cur_block, cur_shape = new_block()
     cur_pos = [cols // 2, 0]
@@ -141,6 +166,10 @@ def main() :
     level = 1
     line_cleared = 0
 
+######### Phase 2 - 추가 구현 기능 3 = 블록 저장 #########
+    stored_block = None
+    can_store = True
+######################################################
 
     start = False
     while not start :
@@ -171,6 +200,22 @@ def main() :
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = not paused
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########
+                if event.key == pygame.K_h:
+                    show_grid = not show_grid
+#########################################################
+########## Phase 2 - 추가 구현 기능 3 = 블록 저장 ##########
+                if event.key == pygame.K_c:
+                    if can_store:
+                        if stored_block:
+                            stored_block, (cur_block, cur_shape) = (cur_block, cur_shape), stored_block
+                            cur_pos = [cols // 2, 0]
+                        else:
+                            stored_block = (cur_block, cur_shape)
+                            cur_block, cur_shape = new_block()
+                            cur_pos = [cols // 2, 0]
+                        can_store = False
+########################################################
                 if not paused:
                     if event.key == pygame.K_LEFT:
                         if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
@@ -181,10 +226,16 @@ def main() :
                     if event.key == pygame.K_DOWN:
                         if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
                             cur_pos[1] += 1
-                    if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
+############# Phase 2 - 추가 구현 기능 2 = 시계/반시계 회전 ##############
+                    if event.key == pygame.K_RSHIFT:
                         rotated_shape = rotate_clockwise(cur_shape)
                         if not check_collision(board, rotated_shape, cur_pos):
                             cur_shape = rotated_shape
+                    if event.key == pygame.K_LSHIFT:
+                        rotated_shape = rotate_counterclockwise(cur_shape)
+                        if not check_collision(board, rotated_shape, cur_pos):
+                            cur_shape = rotated_shape
+######################################################################
 
         keys = pygame.key.get_pressed()
         if not paused:
@@ -214,14 +265,24 @@ def main() :
                             
                     cur_block, cur_shape = new_block()
                     cur_pos = [cols // 2, 0]
+######## Phase 2 - 추가 기능 구현 3 = 블록 저장 ########
+                    can_store = True
+#####################################################
                     if check_collision(board, cur_shape, cur_pos):
                         game_over = True
                         break
 
                         
-        draw_board(board, screen)
+        draw_board(board, screen, show_grid)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
+######## Phase 2 - 추가 기능 구현 3 = 블록 저장 ########        
+        draw_stored_block(stored_block, screen)
+#####################################################
 
+##### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #####
+        if show_grid:
+            draw_grid(screen)
+#################################################
         if paused:
             text = font.render("Paused", True, WHITE)
             screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, screen.get_height() // 2 - text.get_height() // 2))
