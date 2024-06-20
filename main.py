@@ -62,13 +62,26 @@ def draw_block(block_type, block_position, offset_x, offset_y):
         y = pos[1] * block_size + offset_y
         pygame.draw.rect(screen, colors[block_type], (x, y, block_size, block_size))
 
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########     
+def draw_grid(screen):
+    for x in range(0, cell_size * cols, cell_size):
+        pygame.draw.line(screen, WHITE, (x, 0), (x, cell_size * rows))
+    for y in range(0, cell_size * rows, cell_size):
+        pygame.draw.line(screen, WHITE, (0, y), (cell_size * cols, y))
+#########################################################
 
-def draw_board(board, screen):
+def draw_board(board, screen, show_grid):
     for y, row in enumerate(board):
         for x, cell in enumerate(row):
             if cell:
                 pygame.draw.rect(screen, colors[cell], (x * cell_size, y * cell_size, cell_size, cell_size))
-            pygame.draw.rect(screen, WHITE, (x * cell_size, y * cell_size, cell_size, cell_size), 1)
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########   
+            if show_grid:
+#########################################################
+                pygame.draw.rect(screen, WHITE, (x * cell_size, y * cell_size, cell_size, cell_size), 1)
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########
+            pygame.draw.line(screen, WHITE, (cols * cell_size - 1, 0), (cols * cell_size - 1, rows * cell_size))
+#########################################################
 
 
 def level_display(screen , level) :
@@ -126,6 +139,9 @@ def check_collision(board, block, offset):
 def main() :
     game_over = False
     paused = False
+    ###### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off ######
+    show_grid = True 
+    ##################################################
     board = [[0 for _ in range(cols)] for _ in range(rows)]
     cur_block, cur_shape = new_block()
     cur_pos = [cols // 2, 0]
@@ -171,6 +187,10 @@ def main() :
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = not paused
+######### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #########
+                if event.key == pygame.K_h:
+                    show_grid = not show_grid
+#########################################################
                 if not paused:
                     if event.key == pygame.K_LEFT:
                         if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
@@ -219,9 +239,13 @@ def main() :
                         break
 
                         
-        draw_board(board, screen)
+        draw_board(board, screen, show_grid)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
 
+##### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #####
+        if show_grid:
+            draw_grid(screen)
+#################################################
         if paused:
             text = font.render("Paused", True, WHITE)
             screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, screen.get_height() // 2 - text.get_height() // 2))
