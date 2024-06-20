@@ -102,6 +102,10 @@ def gameover_display(screen) :
 def rotate_clockwise(block_shape):
     return [(y, -x) for x, y in block_shape]
 
+########## Phase 2 - 추가 기능 구현 2 = 시계/반시계 회전 ##########
+def rotate_counterclockwise(block_shape):
+    return [(-y, x) for x, y in block_shape]
+##############################################################
 
 def clear_row(board):
     new_board = [row for row in board if any(cell == 0 for cell in row)]
@@ -201,10 +205,16 @@ def main() :
                     if event.key == pygame.K_DOWN:
                         if not check_collision(board, cur_shape, (cur_pos[0], cur_pos[1] + 1)):
                             cur_pos[1] += 1
-                    if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
+############# Phase 2 - 추가 구현 기능 2 = 시계/반시계 회전 ##############
+                    if event.key == pygame.K_RSHIFT:
                         rotated_shape = rotate_clockwise(cur_shape)
                         if not check_collision(board, rotated_shape, cur_pos):
                             cur_shape = rotated_shape
+                    if event.key == pygame.K_LSHIFT:
+                        rotated_shape = rotate_counterclockwise(cur_shape)
+                        if not check_collision(board, rotated_shape, cur_pos):
+                            cur_shape = rotated_shape
+######################################################################
 
         keys = pygame.key.get_pressed()
         if not paused:
