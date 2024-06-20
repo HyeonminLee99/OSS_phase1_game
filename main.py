@@ -98,7 +98,6 @@ def gameover_display(screen) :
     pygame.time.wait(2000)
 
 
-
 def rotate_clockwise(block_shape):
     return [(y, -x) for x, y in block_shape]
 
@@ -139,6 +138,12 @@ def check_collision(board, block, offset):
             return True
     return False
 
+######### Phase 2 - 추가 구현 기능 3 = 블록 저장 #########
+def draw_stored_block(stored_block, screen):
+    if stored_block:
+        block_type, block_shape = stored_block
+        draw_block(block_type, block_shape, cell_size * (cols + 1), cell_size * 10)
+######################################################
 
 def main() :
     game_over = False
@@ -161,6 +166,10 @@ def main() :
     level = 1
     line_cleared = 0
 
+######### Phase 2 - 추가 구현 기능 3 = 블록 저장 #########
+    stored_block = None
+    can_store = True
+######################################################
 
     start = False
     while not start :
@@ -195,6 +204,18 @@ def main() :
                 if event.key == pygame.K_h:
                     show_grid = not show_grid
 #########################################################
+########## Phase 2 - 추가 구현 기능 3 = 블록 저장 ##########
+                if event.key == pygame.K_c:
+                    if can_store:
+                        if stored_block:
+                            stored_block, (cur_block, cur_shape) = (cur_block, cur_shape), stored_block
+                            cur_pos = [cols // 2, 0]
+                        else:
+                            stored_block = (cur_block, cur_shape)
+                            cur_block, cur_shape = new_block()
+                            cur_pos = [cols // 2, 0]
+                        can_store = False
+########################################################
                 if not paused:
                     if event.key == pygame.K_LEFT:
                         if not check_collision(board, cur_shape, (cur_pos[0] - 1, cur_pos[1])):
@@ -244,6 +265,9 @@ def main() :
                             
                     cur_block, cur_shape = new_block()
                     cur_pos = [cols // 2, 0]
+######## Phase 2 - 추가 기능 구현 3 = 블록 저장 ########
+                    can_store = True
+#####################################################
                     if check_collision(board, cur_shape, cur_pos):
                         game_over = True
                         break
@@ -251,6 +275,9 @@ def main() :
                         
         draw_board(board, screen, show_grid)
         draw_block(cur_block, cur_shape, cur_pos[0] * cell_size, cur_pos[1] * cell_size)
+######## Phase 2 - 추가 기능 구현 3 = 블록 저장 ########        
+        draw_stored_block(stored_block, screen)
+#####################################################
 
 ##### Phase 2 - 추가 구현 기능 1 = 격자 ON/Off #####
         if show_grid:
