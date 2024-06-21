@@ -280,7 +280,7 @@ def main() :
         screen.blit(next_text, (cell_size * cols + 10, 90))
         
         for pos in next_shape:
-            x = pos[0] * block_size + 330
+            x = pos[0] * block_size + 320
             y = pos[1] * block_size + 140
             pygame.draw.rect(screen, colors[next_block], (x, y, block_size, block_size))
 ######################################################################################################################▲
