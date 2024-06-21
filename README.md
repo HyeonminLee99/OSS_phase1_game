@@ -41,7 +41,7 @@
 
 - **좌우이동**: 화살표 왼쪽 키와 오른쪽 키(키다운을 통한 연속 이동 가능)
 - **빠르게 내리기**: 화살표 아래 키(키다운 불가)
-- **회전**: Shift 키 (좌우 Shift 모두 사용가능 , 시계방향 회전만 가능)
+- **회전**: Shift 키 (좌->시계방향, 우->시계방향 각각 회전 가능)
 - **일시 정지 및 재개**: P 키
 
 
@@ -51,6 +51,9 @@
 - 게임이 시작되면 'Start' 버튼을 마우스로 클릭하여 게임을 시작할 수 있습니다. 게임 진행 중 실시간으로 점수와 레벨을 확인할 수 있으며, 일정 점수에 도달하면 레벨이 증가하며, 난이도가 높아집니다.
 
 
+## 추가 기능
+- **반시계 방향 회전 추가**: 오른쪽 Shift키를 누를 경우 반시계 방향 회전이 가능합니다.
+- **다음 테트리스 블록 미리보기**: 화면 우측 정보란에 다음에 나올 블록이 표시됩니다.
 
 
 ## Reference 
@@ -62,5 +65,9 @@
 
 ## 실행 예시
 
-![실행결과](https://github.com/HyeonminLee99/OSS_phase1_game/assets/133738567/b1cc0232-52a9-4e49-af2c-eb160ea80685)
+![mainvideo](https://github.com/Evanthekim/oss_personal_project_phase2/assets/60501545/0956fd35-86e7-47ec-b669-7f0b3eefa780)
+
+## 원본 repository
+
+https://github.com/HyeonminLee99/OSS_phase1_game
 
