@@ -65,7 +65,7 @@
 
 ## 실행 예시
 
-![실행결과](https://github.com/HyeonminLee99/OSS_phase1_game/assets/133738567/b1cc0232-52a9-4e49-af2c-eb160ea80685)
+![mainvideo](https://github.com/Evanthekim/oss_personal_project_phase2/assets/60501545/0956fd35-86e7-47ec-b669-7f0b3eefa780)
 
 ## 원본 repository
 
